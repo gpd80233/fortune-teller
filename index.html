@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日運勢抽籤器 (10運勢版)</title>
+    <style>
+        body {
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #1e1e2f, #2d2b55);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            max-width: 380px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+
+        p {
+            color: #d1d1e0;
+            font-size: 0.95rem;
+            margin-top: 0;
+        }
+
+        .fortune-box {
+            margin: 20px 0;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .fortune-img {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .result-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ff79c6;
+            margin: 5px 0 10px 0;
+        }
+
+        .result-desc {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #f8f8f2;
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff79c6, #bd93f9);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(189, 147, 249, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(189, 147, 249, 0.6);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0% { transform: rotate(0deg); }
+            20% { transform: rotate(-10deg); }
+            40% { transform: rotate(10deg); }
+            60% { transform: rotate(-5deg); }
+            80% { transform: rotate(5deg); }
+            100% { transform: rotate(0deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>🔮 每日運勢占卜</h1>
+    <p>誠心想著你心中的問題，按下按鈕抽籤...</p>
+
+    <div class="fortune-box" id="fortuneBox">
+        <img id="img" class="fortune-img" src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300&auto=format&fit=crop" alt="預設圖片">
+        <div class="result-title" id="title">❓</div>
+        <div class="result-desc" id="desc">準備好開啟今日的啟示了嗎？</div>
+    </div>
+
+    <button onclick="drawFortune()">開始抽籤</button>
+</div>
+
+<script>
+    // 剛好 10 個運勢選項與對應圖片
+    const fortunes = [
+        { 
+            title: "🌟 大吉", 
+            desc: "今日貴人相助",
+            image: "https://i.meee.com.tw/mZZDrsw.png"
+        },
+        { 
+            title: "✨ 中吉", 
+            desc: "今日招桃花",
+            image: "https://i.meee.com.tw/tUM0Rpj.jpg"
+        },
+        { 
+            title: "🌿 小吉", 
+            desc: "今日值得奮鬥",
+            image: "https://i.meee.com.tw/kbQjG2C.png"
+        },
+        { 
+            title: "☀️ 吉", 
+            desc: "今日突獲橫財",
+            image: "https://i.meee.com.tw/Jhwd9ih.jpg"
+        },
+        { 
+            title: "☕ 平吉", 
+            desc: "今日忌口",
+            image: "https://i.meee.com.tw/epi0h3e.png"
+        },
+        { 
+            title: "🌗 半吉", 
+            desc: "今日不宜工作",
+            image: "https://i.meee.com.tw/ry3dw8x.png"
+        },
+        { 
+            title: "⚡ 末吉", 
+            desc: "今日不宜丟料",
+            image: "https://i.meee.com.tw/OpKjTFA.png"
+        },
+        { 
+            title: "🌧️ 小凶", 
+            desc: "今日不宜外出",
+            image: "https://i.meee.com.tw/wn0DGRj.jpg"
+        },
+        { 
+            title: "🥀 凶", 
+            desc: "今日招小人",
+            image: "https://i.meee.com.tw/DXuXGGY.jpg"
+        },
+        { 
+            title: "🌌 大凶 (絕地逢生)", 
+            desc: "福禍雙至，禍不單行",
+            image: "https://i.meee.com.tw/gthEAOo.png"
+        }
+    ];
+
+    function drawFortune() {
+        const box = document.getElementById('fortuneBox');
+        const imgEl = document.getElementById('img');
+        const titleEl = document.getElementById('title');
+        const descEl = document.getElementById('desc');
+
+        box.classList.add('shake');
+
+        titleEl.textContent = "⏳";
+        descEl.textContent = "正在感應運勢...";
+
+        setTimeout(() => {
+            const randomIndex = Math.floor(Math.random() * fortunes.length);
+            const result = fortunes[randomIndex];
+
+            imgEl.src = result.image;
+            titleEl.textContent = result.title;
+            descEl.textContent = result.desc;
+
+            box.classList.remove('shake');
+        }, 500);
+    }
+</script>
+
+</body>
+</html>

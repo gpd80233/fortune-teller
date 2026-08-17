@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>算命仙｜問事求籤 V2</title>
+    <style>
+        body {
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #1e1e2f, #2d2b55);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            max-width: 380px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+
+        p {
+            color: #d1d1e0;
+            font-size: 0.95rem;
+            margin-top: 0;
+        }
+
+        .fortune-box {
+            margin: 20px 0;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .fortune-img {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .result-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ff79c6;
+            margin: 5px 0 10px 0;
+        }
+
+        .result-desc {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #f8f8f2;
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff79c6, #bd93f9);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(189, 147, 249, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(189, 147, 249, 0.6);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0% { transform: rotate(0deg); }
+            20% { transform: rotate(-10deg); }
+            40% { transform: rotate(10deg); }
+            60% { transform: rotate(-5deg); }
+            80% { transform: rotate(5deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            box-sizing: border-box;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: rgba(0,0,0,0.2);
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            outline: none;
+            margin-bottom: 15px;
+        }
+
+        textarea::placeholder {
+            color: #aaaabd;
+        }
+
+        .result-fortune {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 5px 0;
+        }
+
+        .question-display {
+            margin-top: 15px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.08);
+            color: #d1d1e0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        #againButton {
+            margin-top: 10px;
+        }
+
+        .character-wrap {
+            margin: 5px auto 15px;
+            min-height: 160px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .character-img {
+            width: 180px;
+            height: 180px;
+            object-fit: contain;
+            image-rendering: pixelated;
+            border-radius: 12px;
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+
+        .character-change {
+            animation: characterPop 0.35s ease;
+        }
+
+        @keyframes characterPop {
+            0% { transform: scale(0.85); opacity: 0.35; }
+            70% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>🔮 算命仙</h1>
+
+    <div class="character-wrap">
+        <img id="character" class="character-img" src="assets/character/normal.png" alt="算命仙">
+    </div>
+
+    <p id="fortune-teller-text">有什麼事情想問？讓老夫替你看看天意。</p>
+
+    <div id="question-area">
+        <textarea id="question" placeholder="請輸入你想問的事情……&#10;例如：我最近換工作好不好？"></textarea>
+        <button onclick="askFortune()">求籤</button>
+    </div>
+
+    <div class="fortune-box" id="fortuneBox" style="display:none;">
+        <img id="img" class="fortune-img" src="" alt="籤詩圖片">
+        <div class="result-fortune" id="fortune">❓</div>
+        <div class="result-title" id="title">今日運勢</div>
+        <div class="result-desc" id="desc"></div>
+        <div class="question-display" id="questionDisplay"></div>
+    </div>
+
+    <button id="againButton" onclick="resetFortune()" style="display:none;">再問一卦</button>
+</div>
+
+<script>
+    const fortunes = [
+        {
+            result: "大吉",
+            title: "今日宜：結交貴人",
+            content: "今日多交友，貴人身邊走。",
+            image: "https://i.meee.com.tw/mZZDrsw.png"
+        },
+        {
+            result: "中吉",
+            title: "今日宜：耐心等待",
+            content: "莫急問花期，好運終會來。",
+            image: "https://i.meee.com.tw/tUM0Rpj.jpg"
+        },
+        {
+            result: "小吉",
+            title: "今日宜：主動出擊",
+            content: "今日勇敢行，好事自然成。",
+            image: "https://i.meee.com.tw/kbQjG2C.png"
+        },
+        {
+            result: "吉",
+            title: "今日宜：整理環境",
+            content: "清理舊煩惱，好運自然找。",
+            image: "https://i.meee.com.tw/Jhwd9ih.jpg"
+        },
+        {
+            result: "大吉",
+            title: "今日宜：早點休息",
+            content: "今日早點睡，明日精神倍。",
+            image: "https://i.meee.com.tw/v4lVvdp.png"
+        },
+        {
+            result: "凶",
+            title: "今日不宜：貪多求快",
+            content: "欲速容易亂，慢走反更安。",
+            image: "https://i.meee.com.tw/gR93iae.png"
+        },
+        {
+            result: "特凶",
+            title: "今日不宜：主動出擊",
+            content: "今日勇敢行，恐有壞事情。",
+            image: "https://i.meee.com.tw/zadpCgS.gif"
+        },
+        {
+            result: "平吉",
+            title: "今日宜：清淡飲食",
+            content: "今日少些口，好運自然有。",
+            image: "https://i.meee.com.tw/epi0h3e.png"
+        },
+        {
+            result: "半吉",
+            title: "今日不宜：過度工作",
+            content: "凡事莫太忙，留力福氣長。",
+            image: "https://i.meee.com.tw/ry3dw8x.png"
+        },
+        {
+            result: "末吉",
+            title: "今日不宜：丟料",
+            content: "今日莫亂丟，免得惹人愁。",
+            image: "https://i.meee.com.tw/OpKjTFA.png"
+        },
+        {
+            result: "小凶",
+            title: "今日不宜：遠行外出",
+            content: "今日風雨多，留家少波折。",
+            image: "https://i.meee.com.tw/wn0DGRj.jpg"
+        },
+        {
+            result: "凶",
+            title: "今日不宜：招惹是非",
+            content: "小人暗中來，謹慎莫招災。",
+            image: "https://i.meee.com.tw/DXuXGGY.jpg"
+        },
+        {
+            result: "大凶",
+            title: "今日不宜：輕舉妄動",
+            content: "福禍雙雙至，凡事多三思。",
+            image: "https://i.meee.com.tw/gthEAOo.png"
+        }
+    ];
+
+    const characterExpressions = {
+        "大吉": "assets/character/happy.png",
+        "中吉": "assets/character/happy.png",
+        "小吉": "assets/character/thumbsup.png",
+        "吉": "assets/character/thumbsup.png",
+        "平吉": "assets/character/normal.png",
+        "半吉": "assets/character/thinking.png",
+        "末吉": "assets/character/worried.png",
+        "小凶": "assets/character/sweat.png",
+        "凶": "assets/character/cry.png",
+        "大凶": "assets/character/shocked.png",
+        "特凶": "assets/character/furious.png"
+    };
+
+    const interactionExpressions = {
+        idle: "assets/character/normal.png",
+        thinking: "assets/character/thinking.png",
+        casting: "assets/character/excited.png",
+        shocked: "assets/character/shocked.png"
+    };
+
+    function changeCharacter(expression) {
+        const characterEl = document.getElementById('character');
+        characterEl.classList.remove('character-change');
+        void characterEl.offsetWidth;
+        characterEl.src = expression;
+        characterEl.classList.add('character-change');
+    }
+
+    function askFortune() {
+        const question = document.getElementById('question').value.trim();
+        const box = document.getElementById('fortuneBox');
+        const questionArea = document.getElementById('question-area');
+        const againButton = document.getElementById('againButton');
+        const imgEl = document.getElementById('img');
+        const fortuneEl = document.getElementById('fortune');
+        const titleEl = document.getElementById('title');
+        const descEl = document.getElementById('desc');
+        const questionDisplay = document.getElementById('questionDisplay');
+        const tellerText = document.getElementById('fortune-teller-text');
+
+        // 已移除原本的 alert(!question) 限制
+
+        questionArea.style.display = "none";
+        changeCharacter(interactionExpressions.thinking);
+        box.style.display = "flex";
+        againButton.style.display = "inline-block";
+        box.classList.add('shake');
+
+        tellerText.textContent = "嗯……讓老夫看看此事的天意……";
+        changeCharacter(interactionExpressions.casting);
+        fortuneEl.textContent = "⏳";
+        titleEl.textContent = "正在求籤...";
+        descEl.textContent = "天機正在顯現……";
+        
+        // 判斷是否提供問題並調整顯示
+        if (question) {
+            questionDisplay.textContent = "你所問之事：「" + question + "」";
+            questionDisplay.style.display = "block";
+        } else {
+            questionDisplay.textContent = "今日求籤運勢";
+            questionDisplay.style.display = "block";
+        }
+
+        setTimeout(() => {
+            const randomIndex = Math.floor(Math.random() * fortunes.length);
+            const result = fortunes[randomIndex];
+
+            imgEl.src = result.image;
+            changeCharacter(characterExpressions[result.result] || interactionExpressions.idle);
+            fortuneEl.textContent = result.result;
+            titleEl.textContent = result.title;
+            descEl.textContent = result.content;
+
+            tellerText.textContent = "籤已落定，天意如此。";
+            box.classList.remove('shake');
+        }, 800);
+    }
+
+    function resetFortune() {
+        document.getElementById('question-area').style.display = "block";
+        document.getElementById('fortuneBox').style.display = "none";
+        document.getElementById('againButton').style.display = "none";
+        document.getElementById('question').value = "";
+        document.getElementById('fortune-teller-text').textContent =
+            "有什麼事情想問？讓老夫替你看看天意。";
+        changeCharacter(interactionExpressions.idle);
+    }
+</script>
+
+</body>
+</html>
